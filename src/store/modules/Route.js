@@ -49,6 +49,7 @@ const actions = {
 		let defaultPath = data[0].route;
 		let format = (data) => {
 			data.forEach(e => {
+				console.log('addRoutes',data);
 				if (e.children) {
 					format(e.children);
 				} else {
@@ -56,7 +57,7 @@ const actions = {
 						path: defaultPath == e.key ? '/backend' : '/backend/' + e.key,
 						name: e.route,
 						component(resolve) {
-							require(['../../components/HelloWorld.vue'], resolve)
+							require(['../../components/' + e.route + '.vue'], resolve)
 						}
 					}
 					routeArr.push(route);
@@ -69,8 +70,8 @@ const actions = {
 			component: Layout,
 			children: routeArr
 		}
+		console.log(layout)
 		router.addRoutes([layout]);
-		console.log('---------------------------1245');
 		context.commit('CHANGEROUTEINIT');
 	}
 };

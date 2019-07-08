@@ -41,8 +41,8 @@
           <div class="page-header-detail">
             <a-dropdown class="page-header-logo">
                 <span class="ant-dropdown-link" href="#">
-                  <a-avatar size="small" icon="user" v-if="avater.length==0"/>
-                  <a-avatar :src="avater" v-if="avater.length>0"/>
+                  <a-avatar size="small" icon="user" v-if="!avater||avater.length==0"/>
+                  <a-avatar :src="avater" v-if="avater&&avater.length>0"/>
                   <span class="username">{{nickName}}</span>
                 </span>
                 <a-menu slot="overlay" @click="userMenuClickHandler">

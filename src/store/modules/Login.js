@@ -13,11 +13,16 @@ const mutations = {
 	LOGINED(state) {
 		state.loginLoading = false;
 	},
+	LOADLOGININFO(state){
+		state.nickName = sessionStorage.getItem("nickName");
+		state.avater = sessionStorage.getItem("avater");
+	},
 	CHANGE_LOGIN_STATU(state, data) {
-		console.log(data);
 		state.accessToken = data.token;
 		state.nickName = data.nickName;
 		state.avater = data.avater;
+		sessionStorage.setItem("avater",data.avater);
+		sessionStorage.setItem("nickName",data.nickName);
 		sessionStorage.setItem('accessToken',data.token);
 	},
 	CLEARLOGININFO(state){

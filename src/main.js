@@ -25,6 +25,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     if (accessToken&&accessToken!='undefined') {
+      store.commit('LOADLOGININFO');
       store.dispatch('loadMenus', router).then(res => {
         store.commit('CHANGEROUTEINIT');
         next({ path: '/backend/' + res });
