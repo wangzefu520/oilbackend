@@ -39,13 +39,14 @@ const actions = {
 		context.commit('LOGINING');
 		return new Promise((resolve, reject) => {
 			api.login(info).then(res => {
+				console.log(res);
 				let data = res.data;
 				if (data.code == 200) {
 					data = data.data;
 					resolve(data);
 					context.commit('CHANGE_LOGIN_STATU', data);
 				} else {
-					reject('请求异常');
+					reject(data.msg);
 				}
 				context.commit('LOGINED');
 			}).catch(err => {
