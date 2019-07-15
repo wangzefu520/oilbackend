@@ -13,7 +13,6 @@ const baseMutations = {
 		state.loading = true;
 	},
 	LOADED(state,data){
-		console.log('=========================================');
 		state.total = data.total;
 		state.currentPageNo=data.pageNo;
 		state.pageSize = data.pageSize;

@@ -2,18 +2,18 @@
   <a-card :bordered="false" :bodyStyle="{ padding: 0 }">
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
-        <a-row type="flex" justify="space-around" :gutter="{md:48}">
-          <a-col :md="6">
+        <a-row type="flex" justify="space-around" :gutter="48">
+          <a-col :md="8" :sm="24">
             <a-form-item label="用户名">
-              <a-input style="width: 100%" v-model="queryParams.userName" placeholder="请输入查询用户名" />
+              <a-input style="width:300px;" v-model="queryParams.userName" placeholder="请输入查询用户名" />
             </a-form-item>
           </a-col>
-          <a-col :md="6">
+          <a-col :md="8" :sm="24">
             <a-form-item label="昵称">
-              <a-input style="width: 100%" v-model="queryParams.nickName" placeholder="请输入查询昵称" />
+              <a-input style="width:300px;" v-model="queryParams.nickName" placeholder="请输入查询昵称" />
             </a-form-item>
           </a-col>
-          <a-col :md="12">
+          <a-col :md="8" :sm="24">
             <a-button type="primary" @click="searchHandler">查询</a-button>
             <a-button style="margin-left: 8px" @click="resetSearchHandler">重置</a-button>
           </a-col>

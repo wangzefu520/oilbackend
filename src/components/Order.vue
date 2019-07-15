@@ -2,198 +2,126 @@
   <a-card :bordered="false" :bodyStyle="{ padding: 0 }">
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
-        <a-row type="flex" justify="space-around" :gutter="{md:48}">
-          <a-col :md="6">
-            <a-form-item label="姓名">
-              <a-input style="width: 100%" v-model="queryParam.name" placeholder="请输入查询名称"/>
+        <a-row type="flex" justify="space-around" :gutter="48">
+          <a-col :md="8" :sm="24">
+            <a-form-item label="订单编号" style="height:57px;line-height:21px;">
+              <a-input style="width:300px;" v-model="queryParam.no" placeholder="请输入查询订单号" />
             </a-form-item>
           </a-col>
-          <a-col :md="6">
-            <a-form-item label="电话">
-              <a-input style="width: 100%" v-model="queryParam.phone" placeholder="请输入查询电话"/>
+          <a-col :md="8" :sm="24">
+            <a-form-item label="查询日期" style="height:57px;line-height:21px;">
+              <a-range-picker
+                style="width:300px;"
+                v-model="queryParam.rangeTime"
+                :showTime="true"
+                format="YYYY-MM-DD HH:mm:ss"
+              />
             </a-form-item>
           </a-col>
-          <a-col :md="6">
-            <a-form-item label="意向户型">
-              <a-select style="width: 120px" v-model="queryParam.houseType" placeholder="请选择意向户型" default-value="0">
-                <a-select-option v-for="type in houseTypes" :key="type.val" :value="type.val" >{{type.name}}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6">
-              <a-button type="primary" @click="searchBuyerHandler">查询</a-button>
-              <a-button style="margin-left: 8px" @click="resetSearchBuyerHandler">重置</a-button>
+          <template v-if="advanced">
+            <a-col :md="8" :sm="24">
+              <a-form-item label="支付类型" style="height:57px;line-height:21px;">
+                <a-select
+                  style="width:300px;"
+                  v-model="queryParam.payType"
+                  placeholder="请选择查询的支付类型"
+                  default-value="0"
+                >
+                  <a-select-option value="0">全部</a-select-option>
+                  <a-select-option value="1">小程序支付</a-select-option>
+                  <a-select-option value="2">公众号支付</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="油站名称" style="height:57px;line-height:21px;">
+                <a-select
+                  showSearch
+                  v-model="queryParam.gasId"
+                  placeholder="请输入油站名称"
+                  :defaultActiveFirstOption="false"
+                  :showArrow="true"
+                  :filterOption="false"
+                  notFoundContent="未查询到数据"
+                  @search="gasSearchHandler"
+                  style="width:300px;"
+                >
+                  <a-select-option v-for="gas in searchGas" :key="gas.id">{{gas.name}}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </template>
+
+          <a-col :md="!advanced? 8:16" :sm="24">
+            <span
+              class="table-page-search-submitButtons"
+              :style="advanced && { float: 'right', overflow: 'hidden' } || {} "
+            >
+              <a-button type="primary" @click="orderSearchHandler">查询</a-button>
+              <a-button style="margin-left: 8px" @click="orderSearchResetHandler">重置</a-button>
+              <a @click="toggleAdvanced" style="margin-left: 8px">
+                {{ advanced ? '收起' : '展开' }}
+                <a-icon :type="advanced ? 'up' : 'down'" />
+              </a>
+            </span>
           </a-col>
         </a-row>
       </a-form>
     </div>
     <div class="table-operations">
-      <a-button @click="showBuyerWinHandler">添加</a-button>
-      <a-button>删除</a-button>
+      <a-button type="primary" icon="download" @click="orderExportHandler">导出</a-button>
     </div>
     <a-table
       rowKey="id"
-      :rowSelection="buyerSelection"
-      :expandedRowKeys="buyerExpandRowKeys"
-      :loading="buyerLoading"
-      :columns="buyerColumn"
+      :loading="loading"
+      :columns="orderColumn"
       bordered
-      :dataSource="buyer"
-      :pagination="buyerPagination"
-      @change="buyerPageChangeHandler"
-      @expandedRowsChange="buyerExpandRowsChange"
+      :dataSource="datas"
+      :pagination="orderPagination"
     >
-      <span slot="action" slot-scope="text, record">
-        <a href="javascript:;" :data-id="record.id" @click="updateBuyerClickHandler(record)">修改</a>
-        <a-divider type="vertical"/>
-        <a href="javascript:;" @click="returnVisitShowWinHandler(record)">回访</a>
-        <a-divider type="vertical"/>
-        <a href="javascript:;">删除</a>
+      <a-tooltip slot="orderNo" slot-scope="text,record" placement="top">
+        <template slot="title">
+          <span>电话：{{record.phone}}</span>
+          <br />
+          <span>车牌：{{record.carLicence}}</span>
+        </template>
+        {{record.no}}
+      </a-tooltip>
+      <a-tooltip slot="gasInfo" slot-scope="text,record" placement="top">
+        <template slot="title">
+          <span>地址：{{record.gasAddr}}</span>
+        </template>
+        {{record.gasName}}
+      </a-tooltip>
+      <span slot="oilType" slot-scope="text,record">
+        {{record.gunName}}
+        <span style="padding-left:10px;font-size:8px;">
+          <a-tag
+            :color="record.oilName=='90'?'pink':record.oilName=='92'?'orange':record.oilName=='95'?'red':record.oilName=='98'?'#f50':'purple'"
+          >{{record.oilName+(record.oilType==1?'汽油':'柴油')}}</a-tag>
+        </span>
       </span>
-      <a-tag slot="status" slot-scope="text" :color="text==1?'cyan':'pink'">{{text==1?'正常':text==2?'已购':'放弃'}}</a-tag>
-      <a-table
-        slot="expandedRowRender"
-        :loading="visitLoading"
-        :columns="visitColumn"
-        :dataSource="visit"
-        :pagination="visitPagination"
-        @change="visitPageChangeHandler"
-      ></a-table>
+      <span slot="oilPrice" slot-scope="text, record">
+        {{record.price}}元
+        <span style="padding-left:10px;font-size:8px;color:#c41d7f;">
+          <span style="text-decoration:line-through;">{{record.marketPrice}}</span>元
+        </span>
+      </span>
+      <span slot="oilTotal" slot-scope="text, record">
+        {{record.oilNum}}升
+        <span style="padding-left:10px;font-size:8px;color:#c41d7f;">
+          <span style="text-decoration:line-through;">{{record.totalOilNum}}</span>升
+        </span>
+      </span>
+      <span slot="totalPrice" slot-scope="text, record">
+        {{record.amount}}元
+        <span style="padding-left:10px;font-size:8px;color:#c41d7f;">
+          <span style="text-decoration:line-through;">{{record.totalAmount}}</span>元
+        </span>
+      </span>
+      <span slot="payType" slot-scope="text,record">{{record.payType==1?'小程序':'公众号'}}</span>
     </a-table>
-    <a-drawer
-      :title="'购房者信息'+(updateBuyerId==-1?'添加':'更新')"
-      placement="right"
-      :width="720"
-      :closable="false"
-      @close="closeBuyerOptionWinHandler"
-      :visible="showBuyerOptionWin"
-      :wrapStyle="{height: 'calc(100% - 108px)',overflow: 'auto',paddingBottom: '108px'}"
-    >
-      <a-form :form="form" layout="vertical">
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="姓名">
-              <a-input
-                v-decorator="['name', {
-                    rules: [{ required: true, message: '请输入姓名' }]
-                  }]"
-                placeholder="请输入姓名"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="电话">
-              <a-input
-                v-decorator="['phone', {
-                    rules: [{ required: true, message: '请输入电话' }]
-                  }]"
-                placeholder="请输入电话"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="户型">
-              <a-select
-                v-decorator="['houseType', {
-                  rules: [{ required: true, message: '请选择户型' }],
-                  initialValue:0
-                }]"
-                placeholder="请选择户型"
-              >
-                <a-select-option
-                  v-for="type in houseTypes"
-                  :key="type.val"
-                  :value="type.val"
-                >{{type.name}}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="购房意向价">
-              <a-input-number
-                v-decorator="['price', {
-                  rules: [{ required: true, message: '请输入购房意向价' }],
-                  initialValue:0
-                }]"
-                style="width: 100%"
-                placeholder="请输入购房意向价"
-                :precision="2"
-                :formatter="value => {
-                    let reg = /^¥/;
-                    if(reg.test(value)){
-                      return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                    }else{
-                      return `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                    }
-                }"
-                :parser="value => value.replace(/¥\s?|(,*)/g, '')"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="24">
-            <a-form-item label="备注">
-              <a-textarea
-                v-decorator="['remark', {
-                  rules: [{ message: '请输入购买备注' }]
-                }]"
-                :rows="4"
-                placeholder="请输入购买备注"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
-      <div
-        :style="{
-          position: 'absolute',
-          left: 0,
-          bottom: 0,
-          width: '100%',
-          borderTop: '1px solid #e9e9e9',
-          padding: '10px 16px',
-          background: '#fff',
-          textAlign: 'right',
-        }"
-      >
-        <a-button :style="{marginRight: '8px'}" @click="closeBuyerOptionWinHandler">取消</a-button>
-        <a-button
-          type="primary"
-          @click="triggerFormSubmitHandler"
-          :loading="buyerOptionWinSubmitLoading"
-        >{{updateBuyerId==-1?'添加':'更新'}}</a-button>
-      </div>
-    </a-drawer>
-    <a-modal
-      title="回访"
-      :visible="returnVisitWinShow"
-      :closable = "false"
-      :maskClosable="false"
-      :confirmLoading="visitSubmitLoading"
-      @ok="returnVisitSubmitHandler"
-      @cancel="returnVisitHideWinHandler"
-      cancelText="取消"
-      okText="提交"
-    >
-      <a-form :form="visitForm">
-        <a-form-item>
-          <a-textarea
-            v-decorator="['content', {
-                  rules: [
-                    {required: true, message: '请输入回访内容' },
-                    {min: 5, message: '回访内容不能小于5个字符' },
-                    {max: 255, message: '回访内容应该小于255个字符' },
-                  ]
-                }]"
-            :rows="6"
-            placeholder="请输入回访内容"
-          />
-        </a-form-item>
-      </a-form>
-    </a-modal>
   </a-card>
 </template>
 
@@ -201,319 +129,131 @@
 import { mapState, mapMutations, mapActions } from "vuex";
 import { message } from "ant-design-vue";
 export default {
-  name: "Buyer",
+  name: "Order",
   data() {
     return {
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
       queryParam: {
-        name:'',
-        phone:'',
-        houseType:0
+        no: "",
+        rangeTime: null,
+        payType: "0",
+        gasId: ""
       },
-      form: this.$form.createForm(this),
-      visitForm:this.$form.createForm(this),
-      buyerColumn: [
+      orderColumn: [
         {
           width: 100,
-          title: "编号",
-          dataIndex: "id",
+          title: "订单编号",
           align: "center",
-          key: "id"
+          key: "no",
+          scopedSlots: { customRender: "orderNo" }
         },
         {
-          width: 100,
-          title: "姓名",
-          dataIndex: "name",
+          width: 80,
+          title: "油站名称",
           align: "center",
-          key: "name"
+          key: "gasInfo",
+          scopedSlots: { customRender: "gasInfo" }
+        },
+        {
+          width: 20,
+          title: "油枪油号",
+          align: "center",
+          key: "oilType",
+          scopedSlots: { customRender: "oilType" }
+        },
+        {
+          width: 20,
+          title: "单价",
+          align: "center",
+          key: "oilPrice",
+          scopedSlots: { customRender: "oilPrice" }
+        },
+        {
+          width: 20,
+          title: "加油量",
+          align: "center",
+          key: "totalOilNum",
+          scopedSlots: { customRender: "oilTotal" }
+        },
+        {
+          width: 20,
+          title: "总价",
+          align: "center",
+          key: "totalPrice",
+          scopedSlots: { customRender: "totalPrice" }
+        },
+        {
+          width: 20,
+          title: "支付类型",
+          align: "center",
+          key: "payType",
+          scopedSlots: { customRender: "payType" }
         },
         {
           width: 120,
-          title: "手机",
-          dataIndex: "phone",
-          align: "center",
-          key: "phone"
-        },
-        {
-          title: "意向户型",
-          dataIndex: "houseType",
-          align: "center",
-          width: 120,
-          key: "houseType",
-          customRender:(type)=>{
-            let {houseTypes} = this;
-            for(let index=0;index<houseTypes.length;index++){
-              let houseType = houseTypes[index];
-              if(houseType.val == type){
-                return houseType.name;
-              }
-            }
-          }
-        },
-        {
-          title: "意向价格",
-          dataIndex: "price",
-          align: "center",
-          width: 120,
-          key: "price"
-        },
-        {
-          title: "状态",
-          dataIndex: "status",
-          align: "center",
-          width: 120,
-          key: "status",
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: "备注",
-          dataIndex: "remark",
-          align: "center",
-          key: "remark"
-        },
-        {
-          title: "操作",
-          key: "operation",
-          align: "center",
-          width: 200,
-          scopedSlots: { customRender: "action" }
-        }
-      ],
-      houseTypes: [
-        {
-          name: "不限",
-          val: 0
-        },
-        {
-          name: "一室一厅",
-          val: 1
-        },
-        {
-          name: "二室一厅",
-          val: 2
-        },
-        {
-          name: "三室一厅",
-          val: 3
-        },
-        {
-          name: "三室一厅",
-          val: 4
-        }
-      ],
-      visitColumn: [
-        {
-          width: 250,
-          title: "回访时间",
+          title: "创建时间",
           dataIndex: "created",
           align: "center",
           key: "created"
-        },
-        {
-          width: 100,
-          title: "回访人",
-          dataIndex: "userId",
-          align: "center",
-          key: "userId"
-        },
-        {
-          title: "回访内容",
-          dataIndex: "content",
-          align: "center",
-          key: "content"
         }
       ]
     };
   },
   computed: {
     ...mapState({
-      buyer: state => state.Buyer.buyer,
-      buyerCount: state => state.Buyer.buyerCount,
-      buyerCurrentPageNo: state => state.Buyer.buyerCurrentPageNo,
-      updateBuyerId: state => state.Buyer.updateBuyerId,
-      buySelectRow: state => state.Buyer.buySelectRow,
-      buyerLoading: state => state.Buyer.buyerLoading,
-      buyerPagination: state => state.Buyer.buyerPagination,
-      buyerSelectRowKeys: state => state.Buyer.buyerSelectRowKeys,
-      buyerExpandRowKeys: state => state.Buyer.buyerExpandRowKeys,
-      buyerExpandRowKey: state => state.Buyer.buyerExpandRowKey,
-      visitLoading: state => state.Buyer.visitLoading,
-      visit: state => state.Buyer.visit,
-      visitCount: state => state.Buyer.visitCount,
-      visitCurrentPageNo: state => state.Buyer.visitCurrentPageNo,
-      visitSubmitLoading:state=>state.Buyer.visitSubmitLoading,
-      returnVisitWinShow: state => state.Buyer.returnVisitWinShow,
-      selectBuyer: state => state.Buyer.selectBuyer,
-      updateBuyerAction: state => state.Buyer.updateBuyerAction,
-      buyerOptionWinSubmitLoading: state =>
-        state.Buyer.buyerOptionWinSubmitLoading,
-      showBuyerOptionWin: state => state.Buyer.showBuyerOptionWin
+      loading: state => state.Manager.loading,
+      datas: state => state.Manager.datas,
+      currentPageNo: state => state.Manager.currentPageNo,
+      pageSize: state => state.Manager.pageSize,
+      total: state => state.Manager.total,
+      searchGas: state => state.Gas.searchGas
     }),
-    buyerPagination() {
+    orderPagination() {
       return {
-        current: this.buyerCurrentPageNo,
-        pageSize: 10,
-        total: this.buyerCount
-      };
-    },
-    buyerSelection() {
-      return {
-        selectedRowKeys: this.buyerSelectRowKeys,
-        onChange: this.buyerSelectHandler,
-        hideDefaultSelections: false
-      };
-    },
-    visitPagination() {
-      return {
-        current: this.visitCurrentPageNo,
-        pageSize: 6,
-        total: this.visitCount
+        current: this.currentPageNo,
+        pageSize: this.pageSize,
+        total: this.total
       };
     }
   },
   created() {
-    this.loadBuyer().catch(err => {
+    this.loadOrder().catch(err => {
       message.warn(err);
     });
   },
   methods: {
-    ...mapActions([
-      "loadBuyer",
-      "buyerSelectRows",
-      "buyerExpandRows",
-      "loadVisit",
-      "buyerSubmitLoading",
-      "showBuyerWinHandler",
-      "buyerSubmitUnloading",
-      "closeBuyerWinHandler",
-      "buyerOptionHandler",
-      "buyerOptionIdHandler",
-      "buyerOptionIdResetHandler",
-      "returnVisitWinShowHandler",
-      "returnVisitWinHideHandler",
-      "returnVisitFormSubmitUnLoadHandler",
-      "returnVisitFormSubmitLoadHandler",
-      "returnVisitSaveHandler"
-    ]),
-    buyerPageChangeHandler(pageInfo) {
-      let {queryParam} = this;
-      if(queryParam.name){
-        pageInfo.name = queryParam.name;
-      }
-      if(queryParam.phone){
-        pageInfo.phone = queryParam.phone;
-      }
-      if(queryParam.houseType>0){
-        pageInfo.houseType = queryParam.houseType;
-      }
-      this.loadBuyer(pageInfo).catch(err => {
+    ...mapActions(["loadOrder", "exportOrder", "loadAllGas"]),
+    orderExportHandler() {
+      this.exportOrder(this.queryParam);
+    },
+    orderSearchHandler() {
+      this.loadOrder(this.queryParam).catch(err => {
         message.warn(err);
       });
     },
-    buyerSelectHandler(rows) {
-      this.buyerSelectRows(rows);
-    },
-    buyerExpandRowsChange(rows) {
-      let len = rows.length;
-      if (len > 0) {
-        this.buyerExpandRows([rows[len - 1]]);
-      } else {
-        this.buyerExpandRows([]);
-      }
-    },
-    visitPageChangeHandler(pageInfo) {
-      if (pageInfo) {
-        pageInfo.buyerId = this.buyerExpandRowKey;
-      }
-      pageInfo.pageNo = pageInfo.current;
-      this.loadVisit(pageInfo).catch(err => {
+    orderSearchResetHandler() {
+      this.queryParam = {
+        no: "",
+        gasId: "",
+        rangeTime: null,
+        payType: "0"
+      };
+      this.loadOrder().catch(err => {
         message.warn(err);
       });
     },
     toggleAdvanced() {
       this.advanced = !this.advanced;
     },
-    updateBuyerClickHandler(buyer) {
-      this.showBuyerWinHandler();
-      let id = buyer.id;
-      this.buyerOptionIdHandler(id);
-      setTimeout(()=> this.form.setFieldsValue(buyer),50);
-    },
-    triggerFormSubmitHandler() {
-      this.buyerSubmitLoading();
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          let update = this.updateBuyerId > 0;
-          if (update) {
-            values.id = this.updateBuyerId;
-          }
-          this.buyerOptionHandler(values)
-            .then(res => {
-              if (!update) {
-                this.form.resetFields();
-              }
-            })
-            .catch(err => {
-              message.warn(err);
-            });
-        } else {
-          this.buyerSubmitUnloading();
-        }
-      });
-    },
-    closeBuyerOptionWinHandler() {
-      this.buyerOptionIdResetHandler();
-      this.closeBuyerWinHandler();
-      this.form.resetFields();
-    },
-    returnVisitShowWinHandler(record) {
-      this.returnVisitWinShowHandler(record.id);
-    },
-    returnVisitSubmitHandler() {
-      this.returnVisitFormSubmitLoadHandler();
-      this.visitForm.validateFields((err, values) => {
-        if (!err) {
-            this.returnVisitSaveHandler(values).then(res=>{
-              this.visitForm.resetFields();
-              this.returnVisitWinHideHandler();
-            }).catch(err=>{
-              message.warn(err);
-              this.returnVisitFormSubmitUnLoadHandler();
-            });
-        } else {
-          this.returnVisitFormSubmitUnLoadHandler();
-        }
-      });
-    },
-    returnVisitHideWinHandler(){
-      this.visitForm.resetFields();
-      this.returnVisitWinHideHandler();
-    },
-    searchBuyerHandler(){
-      let {queryParam} =this;
-      let info = {current:1};
-      if(queryParam.name){
-        info.name = queryParam.name;
+    gasSearchHandler(value) {
+      let keyword = value;
+      if (keyword && keyword.length > 2) {
+        this.loadAllGas(keyword).catch(err => {
+          message.warn(err);
+        });
       }
-      if(queryParam.phone){
-        info.phone = queryParam.phone;
-      }
-      if(queryParam.houseType>0){
-        info.houseType = queryParam.houseType;
-      }
-      this.loadBuyer(info).catch(err => {
-        message.warn(err);
-      });
-    },
-    resetSearchBuyerHandler(){
-        let {queryParam} = this;
-        if(queryParam.name||queryParam.phone||queryParam.houseType >0){
-          this.queryParam = {name:'',phone:'',houseType:0};
-          this.loadBuyer();
-        }
-        
     }
   }
 };

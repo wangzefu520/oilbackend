@@ -2,22 +2,22 @@
   <a-card :bordered="false" :bodyStyle="{ padding: 0 }">
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
-        <a-row type="flex" justify="space-around" :gutter="{md:48}">
-          <a-col :md="6">
+        <a-row type="flex" justify="space-around" :gutter="48">
+          <a-col :md="8" :sm="24">
             <a-form-item label="昵称">
-              <a-input style="width: 100%" v-model="queryParams.nickName" placeholder="请输入查询昵称" />
+              <a-input style="width:300px;" v-model="queryParams.nickName" placeholder="请输入查询昵称" />
             </a-form-item>
           </a-col>
-          <a-col :md="6">
+          <a-col :md="8" :sm="24">
             <a-form-item label="登陆方式">
-              <a-select defaultValue="0" v-model="queryParams.authType" style="width: 120px">
+              <a-select defaultValue="0" v-model="queryParams.authType" style="width:300px;">
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">微信</a-select-option>
                 <a-select-option value="2">小程序</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :md="12">
+          <a-col :md="8" :sm="24">
             <a-button type="primary" @click="searchHandler">查询</a-button>
             <a-button style="margin-left: 8px" @click="resetSearchHandler">重置</a-button>
           </a-col>

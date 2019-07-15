@@ -21,6 +21,7 @@ instance.interceptors.response.use(res=>{
 	let data = res.data;
 	let code =data.code;
 	if(code == 403){
+		sessionStorage.setItem('accessToken','');
 		router.replace('/');
 		return ;
 	}
@@ -87,6 +88,78 @@ let api = {
 		}
 		if(info&&info.authType>0){
 			url = `${url}&authType=${info.authType}`;
+		}
+		return instance.get(url);
+	},
+	loadOrder(info){
+		if(!info){
+			info = {};
+		}
+		let url=`/api/backend/trade`;
+		let pageNo = info&&info.pageNo?info.pageNo:1;
+		let pageSize = info&&info.pageSize?info.pageSize:20;
+		url = `${url}?pageNo=${pageNo}&pageSize=${pageSize}`;
+		let timeRange = info.rangeTime;
+		if(timeRange&&timeRange.length==2){
+			url = `${url}&startTime=${timeRange[0].format("YYYY-MM-DD HH:mm:ss")}`;
+			url = `${url}&endTime=${timeRange[1].format("YYYY-MM-DD HH:mm:ss")}`;
+		}
+		let no = info.no;
+		if(no){
+			url = `${url}&orderNo=${no}`;
+		}
+		let payType = info.payType;
+		if(payType&&payType>0){
+			url = `${url}&payType=${payType}`;
+		}
+		let gasId = info.gasId;
+		if(gasId&&gasId>0){
+			url = `${url}&gasId=${gasId}`;
+		}
+		return instance.get(url);
+	},
+	exportOrder(info){
+		if(!info){
+			info = {};
+		}
+		let url=`/api/backend/trade/export`;
+		let token = sessionStorage.getItem('accessToken');
+		url = `${url}?token=${token}`;
+		let timeRange = info.rangeTime;
+		if(timeRange&&timeRange.length==2){
+			url = `${url}&startTime=${timeRange[0].format("YYYY-MM-DD HH:mm:ss")}`;
+			url = `${url}&endTime=${timeRange[1].format("YYYY-MM-DD HH:mm:ss")}`;
+		}
+		let no = info.no;
+		if(no){
+			url = `${url}&orderNo=${no}`;
+		}
+		let payType = info.payType;
+		if(payType&&payType>0){
+			url = `${url}&payType=${payType}`;
+		}
+		let gasId = info.gasId;
+		if(gasId&&gasId>0){
+			url = `${url}&gasId=${gasId}`;
+		}
+		
+		return window.open(url);
+	},
+	loadAllGas(name){
+		let url = `/api/backend/gas/loadAll?name=${name}`;
+		return instance.get(url);
+	},
+	loadGas(info){
+		if(!info){
+			info = {};
+		}
+		let url = `/api/backend/gas`;
+		let pageNo = info&&info.pageNo?info.pageNo:1;
+		let pageSize = info&&info.pageSize?info.pageSize:20;
+		url = `${url}?pageNo=${pageNo}&pageSize=${pageSize}`;
+		let gasName = info&&info.name;
+		if(gasName){
+			url =`${url}&name=${gasName}`;
 		}
 		return instance.get(url);
 	}
