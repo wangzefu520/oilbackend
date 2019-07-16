@@ -21,7 +21,7 @@
       </a-form>
     </div>
     <div class="table-operations">
-      <a-button>添加</a-button>
+      <a-button @click="showManagerWinHandler">添加</a-button>
     </div>
     <a-table
       rowKey="id"
@@ -33,18 +33,33 @@
     >
       <!-- @click="updateBuyerClickHandler(record)" -->
       <span slot="action" slot-scope="text, record">
-        <a-popconfirm title="确定要重置密码?" @confirm="resetPasswordConfirmHandler(record.id)" okText="确认" cancelText="取消">
+        <a-popconfirm
+          title="确定要重置密码?"
+          @confirm="resetPasswordConfirmHandler(record.id)"
+          okText="确认"
+          cancelText="取消"
+        >
           <a href="#">密码重置</a>
         </a-popconfirm>
         <template v-if="record.username!='admin'">
           <a-divider type="vertical" />
-          <a href="javascript:;" :data-id="record.id">修改</a>
+          <a href="javascript:;" :data-id="record.id" @click="showManagerWinHandler">修改</a>
           <a-divider type="vertical" />
-          <a-popconfirm :title="'确定'+(record.enable?'禁用':'启用')+'用户?'" @confirm="changeManagerStateHandler(record.id,record.enable)" okText="确认" cancelText="取消">
+          <a-popconfirm
+            :title="'确定'+(record.enable?'禁用':'启用')+'用户?'"
+            @confirm="changeManagerStateHandler(record.id,record.enable)"
+            okText="确认"
+            cancelText="取消"
+          >
             <a href="#">{{record.enable?'禁用':'启用'}}</a>
           </a-popconfirm>
           <a-divider type="vertical" />
-          <a-popconfirm :title="'确定删除管理员用户?'" @confirm="deleteManagerHandler(record.id)" okText="确认" cancelText="取消">
+          <a-popconfirm
+            :title="'确定删除管理员用户?'"
+            @confirm="deleteManagerHandler(record.id)"
+            okText="确认"
+            cancelText="取消"
+          >
             <a href="#">删除</a>
           </a-popconfirm>
         </template>
@@ -54,7 +69,93 @@
         slot-scope="text, record"
         :color="record.enable?'cyan':'pink'"
       >{{record.enable?'正常':'禁用'}}</a-tag>
+      <a-tag
+        slot="role"
+        slot-scope="text, record"
+        color="cyan"
+      >{{record.roleType == 1?'管理员':'站点管理员'}}</a-tag>
     </a-table>
+    <a-modal
+      :title="'管理员'+(currentManagerId?'更新':'添加')"
+      :visible="managerWinVisible"
+      :confirmLoading="modelLoading"
+      :closable="false"
+      :maskClosable="false"
+      @ok="submitManagerFormHandler"
+      @cancel="hideManagerWinHandler"
+    >
+      <a-form :form="managerForm">
+        <a-form-item label="用户名" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }">
+          <a-input
+            autocomplete="off"
+            :read-only="currentManagerId?true:false"
+            v-decorator="[
+              'username',
+              {
+                rules: [{ 
+                  required: true, 
+                  message: '请输入用户名' 
+                },{ 
+                  min:5, 
+                  message: '用户名长度需要大于5' 
+                },{ 
+                  max:20, 
+                  message: '用户名长度需要小于20' 
+                }]
+              }
+            ]"
+          />
+        </a-form-item>
+        <a-form-item label="昵称" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }">
+          <a-input
+            autocomplete="off"
+            v-decorator="[
+              'nickname',
+              {rules: [
+                { required: true, message: '请输入昵称' },
+                { min:2, message: '昵称长度需要大于2' },
+                { max:20, message: '昵称长度需要小于20' }
+                ]}
+            ]"
+          />
+        </a-form-item>
+        <a-form-item
+          v-if="currentManagerId==null"
+          label="密码"
+          :label-col="{ span: 5 }"
+          :wrapper-col="{ span: 16 }"
+        >
+          <a-input
+            autocomplete="off"
+            v-decorator="[
+              'password',
+              {rules: [
+                { required: true, message: '请输入密码' },
+                { min:5, message: '密码长度需要大于5' },
+                { max:20, message: '密码长度需要小于20' }
+                ]}
+            ]"
+          />
+        </a-form-item>
+        <a-form-item label="角色" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }">
+          <a-select
+            v-decorator="[
+              'role',
+              {
+                initialValue: '2',
+                rules: [{ 
+                  required: true, 
+                  message: '请选择用户角色'
+                }]
+              }
+            ]"
+          >
+            <a-select-option value="1">管理员</a-select-option>
+            <a-select-option value="2">站点管理员</a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </a-card>
 </template>
 <script>
@@ -64,18 +165,13 @@ export default {
   name: "Manager",
   data() {
     return {
+      managerForm: this.$form.createForm(this),
+      currentManagerId: null,
       queryParams: {
         userName: "",
         nickName: ""
       },
       managerColumn: [
-        {
-          width: 50,
-          title: "编号",
-          dataIndex: "id",
-          align: "center",
-          key: "id"
-        },
         {
           width: 120,
           title: "用户名",
@@ -89,6 +185,13 @@ export default {
           dataIndex: "nickName",
           align: "center",
           key: "nickName"
+        },
+        {
+          width: 100,
+          title: "角色",
+          align: "center",
+          key: "roleType",
+          scopedSlots: { customRender: "role" }
         },
         {
           width: 100,
@@ -118,6 +221,8 @@ export default {
   computed: {
     ...mapState({
       loading: state => state.Manager.loading,
+      modelLoading: state => state.Manager.modelLoading,
+      managerWinVisible: state => state.Manager.managerWinVisible,
       datas: state => state.Manager.datas,
       currentPageNo: state => state.Manager.currentPageNo,
       pageSize: state => state.Manager.pageSize,
@@ -137,7 +242,77 @@ export default {
     });
   },
   methods: {
-    ...mapActions(["loadManager","changePwd","enableManager","disableManager","deleteManager"]),
+    ...mapActions([
+      "loadManager",
+      "changePwd",
+      "enableManager",
+      "disableManager",
+      "deleteManager",
+      "managerWinShow",
+      "managerWinHide",
+      "saveManager",
+      "updateManager"
+    ]),
+    showManagerWinHandler(e) {
+      this.managerWinShow();
+      let dataset = e.target.dataset;
+      if (dataset && dataset.id) {
+        let mamager = null;
+        let managerId = dataset.id;
+        this.datas.forEach(it => {
+          let id = it.id;
+          if (id == managerId) {
+            mamager = it;
+          }
+        });
+        this.currentManagerId = managerId;
+        let obj = {
+          username: mamager.username,
+          nickname: mamager.nickName,
+          role: "2"
+        };
+        setTimeout(() => {
+          this.managerForm.setFieldsValue(obj);
+        }, 100);
+      }
+    },
+    hideManagerWinHandler() {
+      this.managerForm.resetFields();
+      this.currentManagerId = null;
+      this.managerWinHide();
+    },
+    submitManagerFormHandler(e) {
+      e.preventDefault();
+      this.managerForm.validateFields((err, values) => {
+        if (!err) {
+          if (this.currentManagerId) {
+            this.updateManager({
+              id: this.currentManagerId,
+              nickname: values.nickname,
+              roleType: values.role
+            })
+              .then(res => {
+                setTimeout(() => {
+                  this.managerWinHide();
+                }, 500);
+              })
+              .catch(err => {
+                message.warn("更新管理员异常" + err);
+              });
+          } else {
+            this.saveManager(values)
+              .then(res => {
+                setTimeout(() => {
+                  this.managerWinHide();
+                }, 500);
+              })
+              .catch(err => {
+                message.warn("添加管理员异常" + err);
+              });
+          }
+        }
+      });
+    },
     resetSearchHandler() {
       this.queryParams = {
         userName: "",
@@ -165,34 +340,42 @@ export default {
         return;
       }
     },
-    resetPasswordConfirmHandler(id){
-      this.changePwd(id).then(res=>{
-        message.success("重置密码成功,默认密码为111111");
-      }).catch(err=>{
-        message.error("重置密码失败");
-      })
+    resetPasswordConfirmHandler(id) {
+      this.changePwd(id)
+        .then(res => {
+          message.success("重置密码成功,默认密码为111111");
+        })
+        .catch(err => {
+          message.error("重置密码失败");
+        });
     },
-    changeManagerStateHandler(id,enable){
-      if(enable){
-        this.disableManager(id).then(res=>{
-          message.success("禁用用户成功");
-        }).catch(err=>{
-          message.error("禁用用户失败");
-        })
-      }else{
-        this.enableManager(id).then(res=>{
-          message.success("启用用户成功");
-        }).catch(err=>{
-          message.error("启用用户失败");
-        })
+    changeManagerStateHandler(id, enable) {
+      if (enable) {
+        this.disableManager(id)
+          .then(res => {
+            message.success("禁用用户成功");
+          })
+          .catch(err => {
+            message.error("禁用用户失败");
+          });
+      } else {
+        this.enableManager(id)
+          .then(res => {
+            message.success("启用用户成功");
+          })
+          .catch(err => {
+            message.error("启用用户失败");
+          });
       }
     },
-    deleteManagerHandler(id){
-      this.deleteManager(id).then(res=>{
+    deleteManagerHandler(id) {
+      this.deleteManager(id)
+        .then(res => {
           message.success("删除用户成功");
-        }).catch(err=>{
-          message.error("删除用户失败");
         })
+        .catch(err => {
+          message.error("删除用户失败");
+        });
     }
   }
 };

@@ -59,6 +59,23 @@ let api = {
 			url:url
 		});
 	},
+	saveManager(info){
+		let {username,password,nickname,role} = info;
+		let url = `/api/backend/manager`;
+		return instance.request({
+			method:'POST',
+			url:url,
+			data:{username:username,password:password,nickName:nickname,roleType:role}
+		})
+	},
+	updateManager(id,nickname,roleType){
+		let url = `/api/backend/manager/${id}`;
+		return instance.request({
+			method:'PUT',
+			url:url,
+			data:{nickName:nickname,roleType:roleType}
+		})
+	},
 	resetManagerPassword(id){
 		let url = `/api/backend/manager/${id}/resetpsw`;
 		return instance.post(url);
