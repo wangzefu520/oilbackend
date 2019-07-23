@@ -12,6 +12,7 @@ Vue.config.productionTip = false
 Vue.use(Antd)
 router.beforeEach((to, from, next) => {
   if (to.name == 'Login') {
+    sessionStorage.removeItem('accessToken');
     next();
     return;
   }

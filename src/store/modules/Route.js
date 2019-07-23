@@ -49,7 +49,6 @@ const actions = {
 		let defaultPath = data[0].route;
 		let format = (data) => {
 			data.forEach(e => {
-				console.log('addRoutes',data);
 				if (e.children) {
 					format(e.children);
 				} else {
@@ -61,6 +60,16 @@ const actions = {
 						}
 					}
 					routeArr.push(route);
+					if(e.key == 'gas'){
+						let route = {
+							path: '/backend/gas/:id',
+							name: 'GasEdit',
+							component(resolve) {
+								require(['../../components/GasEdit.vue'], resolve)
+							}
+						}
+						routeArr.push(route);
+					}
 				}
 			});
 		};
@@ -70,7 +79,6 @@ const actions = {
 			component: Layout,
 			children: routeArr
 		}
-		console.log(layout)
 		router.addRoutes([layout]);
 		context.commit('CHANGEROUTEINIT');
 	}

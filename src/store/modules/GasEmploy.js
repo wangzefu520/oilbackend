@@ -5,7 +5,7 @@ const state = base.extendFn(base.baseState, {
 });
 
 const mutations = base.extendFn(base.baseMutations, {
-	CHANGEGASSTATE(state,id){
+	CHANGEGASEMPLOYSTATE(state,id){
 		let datas = state.datas;
 		datas.forEach((it) => {
 			if (it.id == id) {
@@ -13,32 +13,17 @@ const mutations = base.extendFn(base.baseMutations, {
 			}
 		})
 	},
-	REMOVEGAS(state, id) {
+	REMOVEGASEMPLOY(state, id) {
 		let datas = state.datas;
 		state.datas = datas.filter(it => it.id != id);
 	}
 });
 
 const actions = base.extendFn(base.baseActions, {
-	loadAllGas(context,name){
-		return new Promise((resolve, reject) => {
-			api.loadAllGas(name).then(res => {
-				let data = res.data;
-				if (data.code == 200) {
-					resolve();
-					context.commit('SEARCHLOADGAS', data.data);
-				} else {
-					reject('请求异常');
-				}
-			}).catch(err => {
-				reject('请求异常');
-			});
-		});
-	},
-	loadGas(context, info) {
+	loadGasEmploy(context, gasId) {
 		return new Promise((resolve, reject) => {
 			context.commit('LOADING');
-			api.loadGas(info).then(res => {
+			api.loadGasEmploy(gasId).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
@@ -53,7 +38,7 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	enableGas(context,id){
+	enableGasEmploy(context,id){
 		return new Promise((resolve, reject) => {
 			api.enableGas(id).then(res => {
 				let data = res.data;
@@ -68,7 +53,7 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	disableGas(context,id){
+	disableGasEmploy(context,id){
 		return new Promise((resolve, reject) => {
 			api.disableGas(id).then(res => {
 				let data = res.data;
@@ -83,7 +68,7 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	deleteGas(context,id){
+	deleteGasEmploy(context,id){
 		return new Promise((resolve, reject) => {
 			api.deleteGas(id).then(res => {
 				let data = res.data;

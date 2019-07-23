@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false" :bodyStyle="{ padding: 0 }">
     <div class="table-operations">
-      <a-button>添加</a-button>
+      <a-button @click="saveGasHandler">添加</a-button>
     </div>
     <a-table
       rowKey="id"
@@ -11,12 +11,12 @@
       :dataSource="datas"
       :pagination="bannerPagination"
     >
-      <template slot="action" slot-scope="text, record">
-        <a href="javascript:;" :data-id="record.id">修改</a>
+      <span slot="action" slot-scope="text, record">
+        <a href="javascript:;" @click="updateGasHandler(record.id)">修改</a>
         <a-divider type="vertical" />
         <a-popconfirm
-          :title="'确定'+(record.enable?'禁用':'启用')+'banner?'"
-          @confirm="changeBannerStatusHandler(record.id,record.enable)"
+          :title="'确定'+(record.enable?'禁用':'启用')+'油站?'"
+          @confirm="changeGasStatusHandler(record.id,record.enable)"
           okText="确认"
           cancelText="取消"
         >
@@ -24,21 +24,20 @@
         </a-popconfirm>
         <a-divider type="vertical" />
         <a-popconfirm
-          :title="'确定删除banner?'"
-          @confirm="deleteBannerHandler(record.id)"
+          :title="'确定删除油站?'"
+          @confirm="deleteGasHandler(record.id)"
           okText="确认"
           cancelText="取消"
         >
           <a href="#">删除</a>
         </a-popconfirm>
-      </template>
-      <img
-        slot="picRender"
-        slot-scope="text, record"
-        width="300"
-        :alt="record.des"
-        :src="record.pic"
-      />
+      </span>
+      <a-tooltip slot="gasNameAddr" slot-scope="text,record" placement="top">
+        <template slot="title">
+          <span>{{record.address}}</span>
+        </template>
+        {{record.name}}
+      </a-tooltip>
       <a-tag
         slot="status"
         slot-scope="text, record"
@@ -51,30 +50,30 @@
 import { mapState, mapMutations, mapActions } from "vuex";
 import { message } from "ant-design-vue";
 export default {
-  name: "Banner",
+  name: "Gas",
   data() {
     return {
       bannerColumn: [
         {
-          width: 100,
-          title: "banner图",
+          width: 120,
+		  title: "油站名称",
           align: "center",
-          key: "pic",
-          scopedSlots: { customRender: "picRender" }
+		  key: "name",
+		  scopedSlots: { customRender: "gasNameAddr" }
         },
         {
           width: 80,
-          title: "h5跳转",
-          dataIndex: "redirect",
+          title: "联系人",
+          dataIndex: "username",
           align: "center",
-          key: "redirect"
+          key: "username"
         },
         {
           width: 80,
-          title: "小程序跳转",
-          dataIndex: "miniRedirect",
+          title: "联系电话",
+          dataIndex: "phone",
           align: "center",
-          key: "miniRedirect"
+          key: "phone"
         },
         {
           width: 80,
@@ -94,24 +93,24 @@ export default {
           title: "操作",
           key: "operation",
           align: "center",
-          width: 120,
+          width: 80,
           scopedSlots: { customRender: "action" }
         }
       ]
     };
   },
   created() {
-    this.loadBanner().catch(res => {
+    this.loadGas().catch(res => {
       message.warn(err);
     });
   },
   computed: {
     ...mapState({
-      loading: state => state.Banner.loading,
-      datas: state => state.Banner.datas,
-      currentPageNo: state => state.Banner.currentPageNo,
-      pageSize: state => state.Banner.pageSize,
-      total: state => state.Banner.total
+      loading: state => state.Gas.loading,
+      datas: state => state.Gas.datas,
+      currentPageNo: state => state.Gas.currentPageNo,
+      pageSize: state => state.Gas.pageSize,
+      total: state => state.Gas.total
     }),
     bannerPagination() {
       return {
@@ -122,20 +121,26 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["loadBanner","enableBanner","disableBanner","deleteBanner"]),
-    changeBannerStatusHandler(id, enable) {
+	...mapActions(["loadGas","enableGas","disableGas","deleteGas"]),
+	saveGasHandler(){
+		this.$router.push({ name: 'GasEdit', params: { id: 'save' }})
+	},
+	updateGasHandler(id){
+		this.$router.push({ name: 'GasEdit', params: { id: id }})
+	},
+    changeGasStatusHandler(id, enable) {
       if(enable){
-        this.disableBanner(id).catch(err=>{
+        this.disableGas(id).catch(err=>{
           message.warn(err);
         });
       }else{
-        this.enableBanner(id).catch(err=>{
+        this.enableGas(id).catch(err=>{
           message.warn(err);
         });
       }
     },
-    deleteBannerHandler(id) {
-      this.deleteBanner(id).catch(err=>{
+    deleteGasHandler(id) {
+      this.deleteGas(id).catch(err=>{
         message.warn(err);
       })
     }

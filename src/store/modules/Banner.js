@@ -5,40 +5,13 @@ const state = base.extendFn(base.baseState, {
 });
 
 const mutations = base.extendFn(base.baseMutations, {
-	CHANGEGASSTATE(state,id){
-		let datas = state.datas;
-		datas.forEach((it) => {
-			if (it.id == id) {
-				it.enable = !it.enable;
-			}
-		})
-	},
-	REMOVEGAS(state, id) {
-		let datas = state.datas;
-		state.datas = datas.filter(it => it.id != id);
-	}
 });
 
 const actions = base.extendFn(base.baseActions, {
-	loadAllGas(context,name){
-		return new Promise((resolve, reject) => {
-			api.loadAllGas(name).then(res => {
-				let data = res.data;
-				if (data.code == 200) {
-					resolve();
-					context.commit('SEARCHLOADGAS', data.data);
-				} else {
-					reject('请求异常');
-				}
-			}).catch(err => {
-				reject('请求异常');
-			});
-		});
-	},
-	loadGas(context, info) {
+	loadBanner(context, info) {
 		return new Promise((resolve, reject) => {
 			context.commit('LOADING');
-			api.loadGas(info).then(res => {
+			api.loadBanner().then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
@@ -53,13 +26,13 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	enableGas(context,id){
+	enableBanner(context,id){
 		return new Promise((resolve, reject) => {
-			api.enableGas(id).then(res => {
+			api.enableBanner(id).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
-					context.commit('CHANGEGASSTATE', id);
+					context.dispatch('loadBanner');
 				} else {
 					reject('请求异常');
 				}
@@ -68,13 +41,13 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	disableGas(context,id){
+	disableBanner(context,id){
 		return new Promise((resolve, reject) => {
-			api.disableGas(id).then(res => {
+			api.disableBanner(id).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
-					context.commit('CHANGEGASSTATE', id);
+					context.dispatch('loadBanner');
 				} else {
 					reject('请求异常');
 				}
@@ -83,13 +56,13 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	deleteGas(context,id){
+	deleteBanner(context,id){
 		return new Promise((resolve, reject) => {
-			api.deleteGas(id).then(res => {
+			api.deleteBanner(id).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
-					context.commit('REMOVEGAS', id);
+					context.dispatch('loadBanner');
 				} else {
 					reject('请求异常');
 				}

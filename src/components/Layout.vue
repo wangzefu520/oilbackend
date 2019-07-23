@@ -12,7 +12,7 @@
             <a-menu-item
               v-if="!menu.children||menu.children.length==0"
               :key="menu.id"
-              :path="menu.key"
+              :path="'/backend/'+menu.key"
             >
               <a-icon :type="menu.iconCls"/>
               <span>{{menu.name}}</span>
@@ -55,9 +55,7 @@
             </a-dropdown>
           </div>
         </a-layout-header>
-        <a-layout-content
-          :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }"
-        >
+        <a-layout-content class="main-container">
           <router-view></router-view>
         </a-layout-content>
       </a-layout>
@@ -145,5 +143,16 @@ export default {
 }
 #components-layout-demo-custom-trigger .page-header-logo:hover{
   background: rgba(0,0,0,.025);
+}
+#components-layout-demo-custom-trigger .main-container{
+  margin: 24px 16px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+}
+#components-layout-demo-custom-trigger .main-container-gasedit{
+  margin: 0px;
+  background: #f0f2f5;
+  min-height: 280px;
 }
 </style>

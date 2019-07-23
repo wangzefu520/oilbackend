@@ -1,0 +1,164 @@
+<template>
+  <a-card class="card" :bordered="false">
+    <div class="table-operations">
+      <a-button>添加</a-button>
+    </div>
+    <a-table
+      rowKey="id"
+      :loading="loading"
+      :columns="gasEmployColumn"
+      bordered
+      :dataSource="datas"
+      :pagination="gasEmployPagination"
+    >
+      <a-tag
+        slot="canBind"
+        slot-scope="text, record"
+        :color="record.canBind?'cyan':'pink'"
+      >{{record.canBind?'可绑定（'+record.secretCode+'）':'已绑定'}}</a-tag>
+	  <a-tag
+        slot="enable"
+        slot-scope="text, record"
+        :color="record.enable?'cyan':'pink'"
+      >{{record.enable?'启用':'禁用'}}</a-tag>
+	  <a-tag
+        slot="triggerMessage"
+        slot-scope="text, record"
+        :color="record.triggerMessage?'cyan':'pink'"
+      >{{record.triggerMessage?'触发':'免扰'}}</a-tag>
+	  <template slot="action" slot-scope="text, record">
+        <a href="javascript:;" :data-id="record.id">修改</a>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          :title="'确定'+(record.enable?'禁用':'启用')+'banner?'"
+          @confirm="changeBannerStatusHandler(record.id,record.enable)"
+          okText="确认"
+          cancelText="取消"
+        >
+          <a href="#">{{record.enable?'禁用':'启用'}}</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          :title="'确定删除banner?'"
+          @confirm="deleteBannerHandler(record.id)"
+          okText="确认"
+          cancelText="取消"
+        >
+          <a href="#">删除</a>
+        </a-popconfirm>
+      </template>
+    </a-table>
+  </a-card>
+</template>
+<script>
+import { mapState, mapMutations, mapActions } from "vuex";
+import { message } from "ant-design-vue";
+export default {
+  name: "GasEmploy",
+  props: {
+    gasId: {
+      type: String
+    }
+  },
+  data() {
+    return {
+      gasEmployColumn: [
+        {
+          width: 70,
+          title: "编号",
+          dataIndex: "no",
+          align: "center",
+          key: "no"
+        },
+        {
+          width: 70,
+          title: "姓名",
+          dataIndex: "name",
+          align: "center",
+          key: "name"
+        },
+        {
+          width: 70,
+          title: "电话",
+          dataIndex: "phone",
+          align: "center",
+          key: "phone"
+        },
+        {
+          width: 70,
+          title: "绑定状态",
+          dataIndex: "canBind",
+          align: "center",
+          key: "canBind",
+          scopedSlots: { customRender: "canBind" }
+        },
+        {
+          width: 70,
+          title: "状态",
+          dataIndex: "enable",
+          align: "center",
+		  key: "enable",
+		  scopedSlots: { customRender: "enable" }
+        },
+        {
+          width: 70,
+          title: "触发消息",
+          dataIndex: "triggerMessage",
+          align: "center",
+		  key: "triggerMessage",
+		  scopedSlots: { customRender: "triggerMessage" }
+        },
+        {
+          width: 110,
+          title: "创建时间",
+          dataIndex: "created",
+          align: "center",
+          key: "created"
+        },
+        {
+          title: "操作",
+          key: "operation",
+          align: "center",
+		  width: 120,
+		  scopedSlots: { customRender: "action" }
+        }
+      ]
+    };
+  },
+  created() {
+    let tempGasId = this.$props.gasId;
+    if (tempGasId != "save") {
+      this.loadGasEmploy(tempGasId).catch(err => {
+        message.warn(err);
+      });
+    }
+  },
+  computed: {
+    ...mapState({
+      loading: state => state.GasEmploy.loading,
+      datas: state => state.GasEmploy.datas,
+      currentPageNo: state => state.GasEmploy.currentPageNo,
+      pageSize: state => state.GasEmploy.pageSize,
+      total: state => state.GasEmploy.total
+    }),
+    gasEmployPagination() {
+      return {
+        current: this.currentPageNo,
+        pageSize: this.pageSize,
+        total: this.total
+      };
+    }
+  },
+  methods: {
+    ...mapActions(["loadGasEmploy"])
+  }
+};
+</script>
+<style scoped>
+.table-operations {
+  padding-bottom: 8px;
+}
+.table-page-search-wrapper {
+  padding-bottom: 8px;
+}
+</style>
