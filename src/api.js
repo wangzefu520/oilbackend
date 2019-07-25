@@ -211,6 +211,22 @@ let api = {
 	loadGasEmploy(gasId){
 		let url = `/api/backend/${gasId}/employ`;
 		return instance.get(url);
+	},
+	resetGasEmployBind(gasId,employId){
+		let url = `/api/backend/${gasId}/employ/${employId}/reset`;
+		return instance.post(url);
+	},
+	enableGasEmploy(gasId,employId){
+		let url = `/api/backend/${gasId}/employ/${employId}/enable`;
+		return instance.post(url);
+	},
+	disableGasEmploy(gasId,employId){
+		let url = `/api/backend/${gasId}/employ/${employId}/disable`;
+		return instance.post(url);
+	},
+	deleteGasEmploy(gasId,employId){
+		let url = `/api/backend/${gasId}/employ/${employId}`;
+		return instance.delete(url);
 	}
 };
 export default api;

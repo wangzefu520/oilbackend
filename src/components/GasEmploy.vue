@@ -16,22 +16,31 @@
         slot-scope="text, record"
         :color="record.canBind?'cyan':'pink'"
       >{{record.canBind?'可绑定（'+record.secretCode+'）':'已绑定'}}</a-tag>
-	  <a-tag
+      <a-tag
         slot="enable"
         slot-scope="text, record"
         :color="record.enable?'cyan':'pink'"
       >{{record.enable?'启用':'禁用'}}</a-tag>
-	  <a-tag
+      <a-tag
         slot="triggerMessage"
         slot-scope="text, record"
         :color="record.triggerMessage?'cyan':'pink'"
       >{{record.triggerMessage?'触发':'免扰'}}</a-tag>
-	  <template slot="action" slot-scope="text, record">
+      <template slot="action" slot-scope="text, record">
         <a href="javascript:;" :data-id="record.id">修改</a>
         <a-divider type="vertical" />
         <a-popconfirm
-          :title="'确定'+(record.enable?'禁用':'启用')+'banner?'"
-          @confirm="changeBannerStatusHandler(record.id,record.enable)"
+          :title="'确定重绑员工?'"
+          @confirm="resetGasEmployBindHandler(record.id,record.enable)"
+          okText="确认"
+          cancelText="取消"
+        >
+          <a href="#">重绑</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          :title="'确定'+(record.enable?'禁用':'启用')+'员工?'"
+          @confirm="changeGasEmployStatusHandler(record.id,record.enable)"
           okText="确认"
           cancelText="取消"
         >
@@ -39,8 +48,8 @@
         </a-popconfirm>
         <a-divider type="vertical" />
         <a-popconfirm
-          :title="'确定删除banner?'"
-          @confirm="deleteBannerHandler(record.id)"
+          :title="'确定删除员工?'"
+          @confirm="deleteGasEmployHandler(record.id)"
           okText="确认"
           cancelText="取消"
         >
@@ -62,30 +71,31 @@ export default {
   },
   data() {
     return {
+      currentGasId: null,
       gasEmployColumn: [
         {
-          width: 70,
+          width: 60,
           title: "编号",
           dataIndex: "no",
           align: "center",
           key: "no"
         },
         {
-          width: 70,
+          width: 60,
           title: "姓名",
           dataIndex: "name",
           align: "center",
           key: "name"
         },
         {
-          width: 70,
+          width: 60,
           title: "电话",
           dataIndex: "phone",
           align: "center",
           key: "phone"
         },
         {
-          width: 70,
+          width: 60,
           title: "绑定状态",
           dataIndex: "canBind",
           align: "center",
@@ -93,20 +103,20 @@ export default {
           scopedSlots: { customRender: "canBind" }
         },
         {
-          width: 70,
+          width: 60,
           title: "状态",
           dataIndex: "enable",
           align: "center",
-		  key: "enable",
-		  scopedSlots: { customRender: "enable" }
+          key: "enable",
+          scopedSlots: { customRender: "enable" }
         },
         {
-          width: 70,
+          width: 60,
           title: "触发消息",
           dataIndex: "triggerMessage",
           align: "center",
-		  key: "triggerMessage",
-		  scopedSlots: { customRender: "triggerMessage" }
+          key: "triggerMessage",
+          scopedSlots: { customRender: "triggerMessage" }
         },
         {
           width: 110,
@@ -119,8 +129,8 @@ export default {
           title: "操作",
           key: "operation",
           align: "center",
-		  width: 120,
-		  scopedSlots: { customRender: "action" }
+          width: 150,
+          scopedSlots: { customRender: "action" }
         }
       ]
     };
@@ -128,6 +138,7 @@ export default {
   created() {
     let tempGasId = this.$props.gasId;
     if (tempGasId != "save") {
+      this.currentGasId = tempGasId;
       this.loadGasEmploy(tempGasId).catch(err => {
         message.warn(err);
       });
@@ -150,7 +161,46 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["loadGasEmploy"])
+    ...mapActions([
+      "loadGasEmploy",
+      "enableGasEmploy",
+      "disableGasEmploy",
+      "deleteGasEmploy",
+      "resetGasEmployBind"
+    ]),
+    resetGasEmployBindHandler(employId){
+      this.resetGasEmployBind({
+          gasId: this.currentGasId,
+          employId: employId
+        }).catch(err => {
+          message.warn(err);
+        });
+    },
+    changeGasEmployStatusHandler(employId, enable) {
+      if (enable) {
+        this.disableGasEmploy({
+          gasId: this.currentGasId,
+          employId: employId
+        }).catch(err => {
+          message.warn(err);
+        });
+      } else {
+        this.enableGasEmploy({
+          gasId: this.currentGasId,
+          employId: employId
+        }).catch(err => {
+          message.warn(err);
+        });
+      }
+    },
+    deleteGasEmployHandler(employId) {
+      this.deleteGasEmploy({
+        gasId: this.currentGasId,
+        employId: employId
+      }).catch(err => {
+        message.warn(err);
+      });
+    }
   }
 };
 </script>

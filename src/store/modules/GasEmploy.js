@@ -16,6 +16,15 @@ const mutations = base.extendFn(base.baseMutations, {
 	REMOVEGASEMPLOY(state, id) {
 		let datas = state.datas;
 		state.datas = datas.filter(it => it.id != id);
+	},
+	CHANGEGASEMPLOYBIND(state,obj){
+		let datas = state.datas;
+		datas.forEach((it) => {
+			if (it.id == obj.id) {
+				it.canBind=obj.canBind;
+				it.secretCode=obj.secretCode;
+			}
+		})
 	}
 });
 
@@ -38,13 +47,13 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	enableGasEmploy(context,id){
+	resetGasEmployBind(context,obj){
 		return new Promise((resolve, reject) => {
-			api.enableGas(id).then(res => {
+			api.resetGasEmployBind(obj.gasId,obj.employId).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
-					context.commit('CHANGEGASSTATE', id);
+					context.commit('CHANGEGASEMPLOYBIND', data.data);
 				} else {
 					reject('请求异常');
 				}
@@ -53,13 +62,13 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	disableGasEmploy(context,id){
+	enableGasEmploy(context,obj){
 		return new Promise((resolve, reject) => {
-			api.disableGas(id).then(res => {
+			api.enableGasEmploy(obj.gasId,obj.employId).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
-					context.commit('CHANGEGASSTATE', id);
+					context.commit('CHANGEGASEMPLOYSTATE', obj.employId);
 				} else {
 					reject('请求异常');
 				}
@@ -68,13 +77,28 @@ const actions = base.extendFn(base.baseActions, {
 			});
 		});
 	},
-	deleteGasEmploy(context,id){
+	disableGasEmploy(context,obj){
 		return new Promise((resolve, reject) => {
-			api.deleteGas(id).then(res => {
+			api.disableGasEmploy(obj.gasId,obj.employId).then(res => {
 				let data = res.data;
 				if (data.code == 200) {
 					resolve();
-					context.commit('REMOVEGAS', id);
+					context.commit('CHANGEGASEMPLOYSTATE', obj.employId);
+				} else {
+					reject('请求异常');
+				}
+			}).catch(err => {
+				reject('请求异常');
+			});
+		});
+	},
+	deleteGasEmploy(context,obj){
+		return new Promise((resolve, reject) => {
+			api.deleteGasEmploy(obj.gasId,obj.employId).then(res => {
+				let data = res.data;
+				if (data.code == 200) {
+					resolve();
+					context.commit('REMOVEGASEMPLOY', obj.employId);
 				} else {
 					reject('请求异常');
 				}

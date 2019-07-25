@@ -126,7 +126,7 @@ export default {
 		this.$router.push({ name: 'GasEdit', params: { id: 'save' }})
 	},
 	updateGasHandler(id){
-		this.$router.push({ name: 'GasEdit', params: { id: id }})
+		this.$router.push({ name: 'GasEdit', params: { id: id+"" }})
 	},
     changeGasStatusHandler(id, enable) {
       if(enable){
