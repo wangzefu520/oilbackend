@@ -212,6 +212,14 @@ let api = {
 		let url = `/api/backend/${gasId}/employ`;
 		return instance.get(url);
 	},
+	saveGasEmploy(gasId,obj){
+		let url = `/api/backend/${gasId}/employ`;
+		return instance.post(url,obj);
+	},
+	updateGasEmploy(gasId,employId,obj){
+		let url = `/api/backend/${gasId}/employ/${employId}`;
+		return instance.put(url,obj);
+	},
 	resetGasEmployBind(gasId,employId){
 		let url = `/api/backend/${gasId}/employ/${employId}/reset`;
 		return instance.post(url);

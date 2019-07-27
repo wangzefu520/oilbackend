@@ -2,6 +2,8 @@ import api from '../../api';
 import base from './Base';
 
 const state = base.extendFn(base.baseState, {
+	gasEmployWinLoading:false,
+	gasEmployWinVisible:false
 });
 
 const mutations = base.extendFn(base.baseMutations, {
@@ -25,10 +27,22 @@ const mutations = base.extendFn(base.baseMutations, {
 				it.secretCode=obj.secretCode;
 			}
 		})
+	},
+	GASEMPLOYWINSHOW(state){
+		state.gasEmployWinVisible=true;
+	},
+	GASEMPLOYWINHIDE(state){
+		state.gasEmployWinVisible = false;
 	}
 });
 
 const actions = base.extendFn(base.baseActions, {
+	gasEmployWinShow(context) {
+		context.commit('GASEMPLOYWINSHOW');
+	},
+	gasEmployWinHide(context) {
+		context.commit('GASEMPLOYWINHIDE');
+	},
 	loadGasEmploy(context, gasId) {
 		return new Promise((resolve, reject) => {
 			context.commit('LOADING');
@@ -44,6 +58,39 @@ const actions = base.extendFn(base.baseActions, {
 			}).catch(err => {
 				reject('请求异常');
 				context.commit('UNLOAD');
+			});
+		});
+	},
+	saveGasEmploy(context,obj){
+		let gasId = obj.gasId;
+		return new Promise((resolve, reject) => {
+			api.saveGasEmploy(gasId,{name:obj.name,phone:obj.phone}).then(res => {
+				let data = res.data;
+				if (data.code == 200) {
+					resolve();
+					context.dispatch('loadGasEmploy', gasId);
+				} else {
+					reject('请求异常');
+				}
+			}).catch(err => {
+				reject('请求异常');
+			});
+		});
+	},
+	updateGasEmploy(context,obj){
+		let gasId = obj.gasId;
+		let gasEmployId = obj.gasEmployId;
+		return new Promise((resolve, reject) => {
+			api.updateGasEmploy(gasId,gasEmployId,{name:obj.name,phone:obj.phone}).then(res => {
+				let data = res.data;
+				if (data.code == 200) {
+					resolve();
+					context.dispatch('loadGasEmploy', gasId);
+				} else {
+					reject('请求异常');
+				}
+			}).catch(err => {
+				reject('请求异常');
 			});
 		});
 	},
