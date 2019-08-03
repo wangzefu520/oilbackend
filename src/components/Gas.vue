@@ -56,10 +56,10 @@ export default {
       bannerColumn: [
         {
           width: 120,
-		  title: "油站名称",
+          title: "油站名称",
           align: "center",
-		  key: "name",
-		  scopedSlots: { customRender: "gasNameAddr" }
+          key: "name",
+          scopedSlots: { customRender: "gasNameAddr" }
         },
         {
           width: 80,
@@ -93,7 +93,7 @@ export default {
           title: "操作",
           key: "operation",
           align: "center",
-          width: 80,
+          width: 85,
           scopedSlots: { customRender: "action" }
         }
       ]
@@ -121,28 +121,28 @@ export default {
     }
   },
   methods: {
-	...mapActions(["loadGas","enableGas","disableGas","deleteGas"]),
-	saveGasHandler(){
-		this.$router.push({ name: 'GasEdit', params: { id: 'save' }})
-	},
-	updateGasHandler(id){
-		this.$router.push({ name: 'GasEdit', params: { id: id+"" }})
-	},
+    ...mapActions(["loadGas", "enableGas", "disableGas", "deleteGas"]),
+    saveGasHandler() {
+      this.$router.push({ name: "GasEdit", params: { id: "save" } });
+    },
+    updateGasHandler(id) {
+      this.$router.push({ name: "GasEdit", params: { id: id + "" } });
+    },
     changeGasStatusHandler(id, enable) {
-      if(enable){
-        this.disableGas(id).catch(err=>{
+      if (enable) {
+        this.disableGas(id).catch(err => {
           message.warn(err);
         });
-      }else{
-        this.enableGas(id).catch(err=>{
+      } else {
+        this.enableGas(id).catch(err => {
           message.warn(err);
         });
       }
     },
     deleteGasHandler(id) {
-      this.deleteGas(id).catch(err=>{
+      this.deleteGas(id).catch(err => {
         message.warn(err);
-      })
+      });
     }
   }
 };

@@ -167,7 +167,7 @@ export default {
           scopedSlots: { customRender: "triggerMessage" }
         },
         {
-          width: 110,
+          width: 125,
           title: "创建时间",
           dataIndex: "created",
           align: "center",
@@ -177,7 +177,7 @@ export default {
           title: "操作",
           key: "operation",
           align: "center",
-          width: 150,
+          width: 160,
           scopedSlots: { customRender: "action" }
         }
       ]

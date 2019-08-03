@@ -196,6 +196,18 @@ let api = {
 		}
 		return instance.get(url);
 	},
+	loadSingleGas(id){
+		let url = `/api/backend/gas/${id}`;
+		return instance.get(url);
+	},
+	saveGas(obj){
+		let url = `/api/backend/gas`;
+		return instance.post(url,obj);
+	},
+	updateGas(id,obj){
+		let url = `/api/backend/gas/${id}`;
+		return instance.put(url,obj);
+	},
 	enableGas(id) {
 		let url = `/api/backend/gas/${id}/enable`;
 		return instance.put(url);
@@ -207,6 +219,53 @@ let api = {
 	deleteGas(id){
 		let url = `/api/backend/gas/${id}`;
 		return instance.delete(url);
+	},
+	loadOil(gasId){
+		let url = `/api/backend/${gasId}/oil`;
+		return instance.get(url);
+	},
+	saveOil(gasId,obj){
+		let url = `/api/backend/${gasId}/oil`;
+		return instance.post(url,obj);
+	},
+	updateOil(gasId,oilId,obj){
+		let url = `/api/backend/${gasId}/oil/${oilId}`;
+		return instance.put(url,obj);
+	},
+	deleteOil(gasId,oilId){
+		let url = `/api/backend/${gasId}/oil/${oilId}`;
+		return instance.delete(url);
+	},
+	enableOil(gasId,oilId){
+		let url = `/api/backend/${gasId}/oil/${oilId}/enable`;
+		return instance.put(url);
+	},
+	disableOil(gasId,oilId){
+		let url = `/api/backend/${gasId}/oil/${oilId}/disable`;
+		return instance.put(url);
+	},
+	loadGun(gasId){
+		let url = `/api/backend/${gasId}/gun`;
+		return instance.get(url);
+	},
+	saveGun(gasId,obj){
+		let url = `/api/backend/${gasId}/gun`;
+		return instance.post(url,obj);
+	},
+	updateGun(gasId,gunId,obj){
+		let url = `/api/backend/${gasId}/gun/${gunId}`;
+		return instance.put(url,obj);
+	},
+	deleteGun(gasId,gunId,obj){
+		
+	},
+	enableGun(gasId,gunId){
+		let url = `/api/backend/${gasId}/gun/${gunId}/enable`;
+		return instance.put(url);
+	},
+	disableGun(gasId,gunId){
+		let url = `/api/backend/${gasId}/gun/${gunId}/disable`;
+		return instance.put(url);
 	},
 	loadGasEmploy(gasId){
 		let url = `/api/backend/${gasId}/employ`;
