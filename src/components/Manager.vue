@@ -244,7 +244,7 @@ export default {
   methods: {
     ...mapActions([
       "loadManager",
-      "changePwd",
+      "resetPwd",
       "enableManager",
       "disableManager",
       "deleteManager",
@@ -341,7 +341,7 @@ export default {
       }
     },
     resetPasswordConfirmHandler(id) {
-      this.changePwd(id)
+      this.resetPwd(id)
         .then(res => {
           message.success("重置密码成功,默认密码为111111");
         })

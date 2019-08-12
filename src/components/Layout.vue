@@ -50,6 +50,7 @@
                     <a href="http://www.alipay.com/">个人设置</a>
                   </a-menu-item>
                   <a-menu-divider /> -->
+                  <a-menu-item key="changepsw">密码修改</a-menu-item>
                   <a-menu-item key="loginout">退出登录</a-menu-item>
                 </a-menu>
             </a-dropdown>
@@ -59,16 +60,22 @@
           <router-view></router-view>
         </a-layout-content>
       </a-layout>
+      <change-psw-win :show="changePswWinVisible" @hide="hideChangePswHandler"/>
     </a-layout>
 </template>
 
 <script>
+import ChangePswWin from "./ChangePswWin";
 import { message } from "ant-design-vue";
 import { mapState, mapMutations, mapActions } from "vuex";
 export default {
   name: "layout",
+  components: {
+    ChangePswWin
+  },
   data(){
     return {
+      changePswWinVisible:false
     }
   },
   computed: {
@@ -93,7 +100,15 @@ export default {
       let key = e.key;
       if(key == 'loginout'){
         this.loginoutHandler();
+      }else{
+        this.showChangePswHandler();
       }
+    },
+    showChangePswHandler(){
+      this.changePswWinVisible = true;
+    },
+    hideChangePswHandler(){
+      this.changePswWinVisible = false;
     },
     loginoutHandler(){
       this.logoutHandle().then(res=>{

@@ -43,6 +43,17 @@ let api = {
 		let url = `/api/backend/menu`;
 		return instance.get(url);
 	},
+	upload(file){
+		let url = '/api/backend/aliyun/oss/upload';
+		let param = new FormData();
+		param.append("file", file);
+		return instance.request({
+			url: url,
+			method: 'post',
+			headers: {'Content-Type': 'multipart/form-data'},
+			data:param
+		});
+	},
 	loadManager(info) {
 		let url = `/api/backend/manager`;
 		let pageNo = info && info.pageNo ? info.pageNo : 1;
@@ -79,6 +90,10 @@ let api = {
 	resetManagerPassword(id) {
 		let url = `/api/backend/manager/${id}/resetpsw`;
 		return instance.post(url);
+	},
+	changeManagerPassword(obj){
+		let url = `/api/backend/manager/changePsw`;
+		return instance.post(url,obj);
 	},
 	disableManager(id) {
 		let url = `/api/backend/manager/${id}/disable`;
@@ -161,6 +176,14 @@ let api = {
 		}
 
 		return window.open(url);
+	},
+	saveBanner(data){
+		let url = `/api/backend/banner`;
+		return instance.post(url,data)
+	},
+	updateBanner(id,data){
+		let url = `/api/backend/banner/${id}`;
+		return instance.put(url,data)
 	},
 	loadBanner() {
 		let url = `/api/backend/banner`;

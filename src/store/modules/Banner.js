@@ -8,6 +8,26 @@ const mutations = base.extendFn(base.baseMutations, {
 });
 
 const actions = base.extendFn(base.baseActions, {
+	saveBanner(context,obj){
+		return new Promise((resolve, reject)=>{
+			api.saveBanner(obj).then(res=>{
+				resolve();
+				context.dispatch('loadBanner');
+			}).catch(err=>{
+				reject('请求异常');
+			});
+		});
+	},
+	updateBanner(context,obj){
+		return new Promise((resolve, reject)=>{
+			api.updateBanner(obj.id,{pic:obj.pic}).then(res=>{
+				resolve();
+				context.dispatch('loadBanner');
+			}).catch(err=>{
+				reject('请求异常');
+			});
+		});
+	},
 	loadBanner(context, info) {
 		return new Promise((resolve, reject) => {
 			context.commit('LOADING');

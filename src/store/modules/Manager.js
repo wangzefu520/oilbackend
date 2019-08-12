@@ -91,7 +91,21 @@ const actions = base.extendFn(base.baseActions, {
 			})
 		});
 	},
-	changePwd(context, id) {
+	changePsw(context,obj){
+		return new Promise((resolve, reject) => {
+			api.changeManagerPassword(obj).then(res => {
+				let data = res.data;
+				if (data.code == 200) {
+					resolve();
+				} else {
+					reject(data.msg);
+				}
+			}).catch(err => {
+				reject('请求异常');
+			});
+		});
+	},
+	resetPwd(context, id) {
 		return new Promise((resolve, reject) => {
 			api.resetManagerPassword(id).then(res => {
 				let data = res.data;

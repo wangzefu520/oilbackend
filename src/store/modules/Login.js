@@ -1,5 +1,6 @@
 import api from '../../api';
 const state = {
+	username:null,
 	nickName:null,
 	avater:null,
 	accessToken: null,
@@ -16,11 +17,14 @@ const mutations = {
 	LOADLOGININFO(state){
 		state.nickName = sessionStorage.getItem("nickName");
 		state.avater = sessionStorage.getItem("avater");
+		state.username = sessionStorage.getItem("username");
 	},
 	CHANGE_LOGIN_STATU(state, data) {
+		state.username = data.username;
 		state.accessToken = data.token;
 		state.nickName = data.nickName;
 		state.avater = data.avater;
+		sessionStorage.setItem("username",data.username);
 		sessionStorage.setItem("avater",data.avater);
 		sessionStorage.setItem("nickName",data.nickName);
 		sessionStorage.setItem('accessToken',data.token);

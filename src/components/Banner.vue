@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false" :bodyStyle="{ padding: 0 }">
     <div class="table-operations">
-      <a-button>添加</a-button>
+      <a-button @click="showBannerOperateWinHandler">添加</a-button>
     </div>
     <a-table
       rowKey="id"
@@ -12,7 +12,7 @@
       :pagination="bannerPagination"
     >
       <template slot="action" slot-scope="text, record">
-        <a href="javascript:;" :data-id="record.id">修改</a>
+        <a href="javascript:;" @click="changeBannerHandler(record)">修改</a>
         <a-divider type="vertical" />
         <a-popconfirm
           :title="'确定'+(record.enable?'禁用':'启用')+'banner?'"
@@ -45,15 +45,26 @@
         :color="record.enable?'cyan':'pink'"
       >{{record.enable?'正常':'禁用'}}</a-tag>
     </a-table>
+    <banner-operate-win
+      :show="bannerWinVisible"
+      :banner="editBanner"
+      @hide="hideBannerOperateWinHandler"
+    />
   </a-card>
 </template>
 <script>
 import { mapState, mapMutations, mapActions } from "vuex";
 import { message } from "ant-design-vue";
+import BannerOperateWin from "./BannerOperateWin";
 export default {
   name: "Banner",
+  components: {
+    BannerOperateWin
+  },
   data() {
     return {
+      bannerWinVisible: false,
+      editBanner: null,
       bannerColumn: [
         {
           width: 100,
@@ -122,22 +133,38 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["loadBanner","enableBanner","disableBanner","deleteBanner"]),
+    ...mapActions([
+      "loadBanner",
+      "enableBanner",
+      "disableBanner",
+      "deleteBanner"
+    ]),
+    showBannerOperateWinHandler() {
+      this.bannerWinVisible = true;
+    },
+    hideBannerOperateWinHandler() {
+      this.bannerWinVisible = false;
+      this.editBanner = null;
+    },
+    changeBannerHandler(banner) {
+      this.bannerWinVisible = true;
+      this.editBanner = banner;
+    },
     changeBannerStatusHandler(id, enable) {
-      if(enable){
-        this.disableBanner(id).catch(err=>{
+      if (enable) {
+        this.disableBanner(id).catch(err => {
           message.warn(err);
         });
-      }else{
-        this.enableBanner(id).catch(err=>{
+      } else {
+        this.enableBanner(id).catch(err => {
           message.warn(err);
         });
       }
     },
     deleteBannerHandler(id) {
-      this.deleteBanner(id).catch(err=>{
+      this.deleteBanner(id).catch(err => {
         message.warn(err);
-      })
+      });
     }
   }
 };
