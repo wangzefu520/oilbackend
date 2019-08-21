@@ -317,6 +317,14 @@ let api = {
 	deleteGasEmploy(gasId,employId){
 		let url = `/api/backend/${gasId}/employ/${employId}`;
 		return instance.delete(url);
+	},
+	loadConfig(){
+		let url = `/api/backend/config`;
+		return instance.get(url);
+	},
+	updateConfig(arr){
+		let url = `/api/backend/config`;
+		return instance.post(url,arr);
 	}
 };
 export default api;
