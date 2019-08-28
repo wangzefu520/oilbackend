@@ -28,7 +28,7 @@
         placeholder="密码"
       />
     </a-form-item>
-    <a-checkbox v-model="remember" checked class="remember">记住密码</a-checkbox>
+    <!-- <a-checkbox v-model="remember" checked class="remember">记住密码</a-checkbox> -->
     <a-form-item style="width:100%;">
       <a-button type="primary" style="width:100%;" html-type="submit" :loading="loginLoading">登录</a-button>
       <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->

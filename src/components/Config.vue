@@ -7,14 +7,10 @@
           v-model="config.number"
           :formatter="value => `${value}${msg}`"
           :parser="value => value.replace(msg, '')"
-          :step="1"
+          :precision="2"
+          :step="0.01"
+          :max="1.5"
         />
-      </a-form-item>
-      <a-form-item label="节省类型" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }">
-        <a-select defaultValue="1" v-model="config.type">
-          <a-select-option value="1">金额</a-select-option>
-          <a-select-option value="2">百分比</a-select-option>
-        </a-select>
       </a-form-item>
       <a-form-item :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" style="text-align:center;">
         <a-button type="primary" :loading="btnLoading" @click="submitHandler">提交</a-button>
@@ -37,7 +33,7 @@ export default {
         type: "1",
         number: 0
       },
-      msg: "分"
+      msg: "元"
     };
   },
   created() {
@@ -45,15 +41,11 @@ export default {
       .then(arr => {
         let obj = {};
         arr.forEach(it => {
-          if (it.key == "thrift_type") {
-            obj.type = it.val;
-          } else if (it.key == "thrift_num") {
+          if (it.key == "thrift_num") {
             obj.number = it.val;
           }
         });
-        this.config.type = obj.type;
         this.config.number = obj.number;
-        this.preConfig.preType = obj.type;
         this.preConfig.preNumber=obj.number;
       })
       .catch(err => {
@@ -69,17 +61,16 @@ export default {
     ...mapActions(["loadConfig","updateConfig"]),
     submitHandler(){
       this.btnLoading=true;
-      let {preType,preNumber} =this.preConfig;
-      let {type,number} = this.config;
-      if(preType == type&&preNumber == number){
+      let {preNumber} =this.preConfig;
+      let {number} = this.config;
+      if(preNumber == number){
         message.success("操作成功");
         this.btnLoading=false;
       }else{
-        let arr = [{key:'thrift_type',val:type},{key:'thrift_num',val:number}]
+        let arr = [{key:'thrift_num',val:number}]
         this.updateConfig(arr).then(res=>{
             message.success("操作成功");
             this.btnLoading=false;
-            this.preConfig.preType = type;
             this.preConfig.preNumber=number;
         }).catch(err=>{
           message.warn("操作失败"+err);

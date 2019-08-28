@@ -43,7 +43,6 @@ const actions = {
 		context.commit('LOGINING');
 		return new Promise((resolve, reject) => {
 			api.login(info).then(res => {
-				console.log(res);
 				let data = res.data;
 				if (data.code == 200) {
 					data = data.data;
@@ -61,6 +60,7 @@ const actions = {
 	},
 	logoutHandle(context){
 		context.commit('CLEARLOGININFO');
+		context.commit('ROUTESCLEAR');
 		return new Promise((resolve)=>{
 			resolve();
 		});

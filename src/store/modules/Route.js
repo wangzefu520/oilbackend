@@ -11,6 +11,10 @@ const mutations = {
 	},
 	LOADEDMENUS(state, routes) {
 		state.routes = routes;
+	},
+	ROUTESCLEAR(state){
+		state.initRoute = false;
+		state.routes=[];
 	}
 };
 const actions = {
