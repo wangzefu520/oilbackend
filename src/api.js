@@ -3,7 +3,7 @@ import axios from 'axios';
 import router from './router'
 let pageSize = 20;
 let instance = axios.create({
-	baseURL: '/',
+	baseURL: '',
 	timeout: 2000
 });
 
@@ -29,7 +29,7 @@ instance.interceptors.response.use(res => {
 });
 let api = {
 	login(userInfo) {
-		let url = `/login`;
+		let url = `/api/login`;
 		return instance.request({
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
