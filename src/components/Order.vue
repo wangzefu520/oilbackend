@@ -46,8 +46,7 @@
                   @search="gasSearchHandler"
                   style="width:300px;"
                 >
-                  <a-select-option v-for="gas in searchGas" :key="gas.id">{{gas.name}}
-                  </a-select-option>
+                  <a-select-option v-for="gas in searchGas" :key="gas.id">{{gas.name}}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -79,6 +78,7 @@
       bordered
       :dataSource="datas"
       :pagination="orderPagination"
+      @change="changePageHandler"
     >
       <a-tooltip slot="orderNo" slot-scope="text,record" placement="top">
         <template slot="title">
@@ -254,6 +254,15 @@ export default {
           message.warn(err);
         });
       }
+    },
+    changePageHandler(paging) {
+      let { current, pageSize } = paging;
+      let obj = this.queryParam;
+      obj.pageNo = current;
+      obj.pageSize = pageSize;
+      this.loadOrder(obj).catch(err => {
+        message.warn(err);
+      });
     }
   }
 };
