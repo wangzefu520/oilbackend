@@ -11,12 +11,8 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/login':{
-        target: 'http://localhost/', // 设置你调用的接口域名和端口号
-        changeOrigin: true     // 跨域
-      },
-      '/api/backend': {
-        target: 'http://localhost/', // 设置你调用的接口域名和端口号
+      '/api':{
+        target: 'http://oil.gyouzhe.cn/', // 设置你调用的接口域名和端口号
         changeOrigin: true     // 跨域
       }
     },
