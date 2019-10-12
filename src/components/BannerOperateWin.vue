@@ -84,7 +84,7 @@ export default {
       });
     },
     beforeUpload(file) {
-      const isJPG = file.type === "image/jpeg";
+      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
       if (!isJPG) {
         this.$message.error("请上传JPG图片");
       }
@@ -103,8 +103,7 @@ export default {
       //   this.$message.error("请上传350px X 150px的图片");
       //   return ;
       // }
-      api
-        .upload(file)
+      api.upload(file)
         .then(res => {
           let { data } = res;
           let code = data.code;
