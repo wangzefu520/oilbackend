@@ -30,6 +30,7 @@
       bordered
       :dataSource="datas"
       :pagination="managerPagination"
+      @change="changePageHandler"
     >
       <!-- @click="updateBuyerClickHandler(record)" -->
       <span slot="action" slot-scope="text, record">
@@ -376,6 +377,22 @@ export default {
         .catch(err => {
           message.error("删除用户失败");
         });
+    },
+    changePageHandler(paging) {
+      let { current, pageSize } = paging;
+      let obj = { pageNo: current, pageSize: pageSize };
+      let username = this.queryParams.userName;
+      let nickname = this.queryParams.nickName;
+      if (
+        (username && username.replace(/\s/g, "").length > 0) ||
+        (nickname && nickname.replace(/\s/g, "").length > 0)
+      ) {
+        obj.username = username;
+        obj.nickname = nickname;
+      }
+      this.loadManager(obj).catch(res => {
+        message.warn(err);
+      });
     }
   }
 };

@@ -28,7 +28,7 @@
       >{{record.triggerMessage?'触发':'免扰'}}</a-tag>
       <template slot="action" slot-scope="text, record">
         <a href="javascript:;" :data-id="record.id" @click="showGasEmployWinHandler">修改</a>
-        <a-divider type="vertical" v-if="!record.canBind"/>
+        <a-divider type="vertical" v-if="!record.canBind" />
         <a-popconfirm
           v-if="!record.canBind"
           :title="'确定重绑员工?'"
@@ -118,8 +118,8 @@ export default {
   data() {
     return {
       currentGasId: null,
-      currentGasEmployId:null,
-      currentGasEmployForm:this.$form.createForm(this),
+      currentGasEmployId: null,
+      currentGasEmployForm: this.$form.createForm(this),
       gasEmployColumn: [
         {
           width: 60,
@@ -199,8 +199,8 @@ export default {
       currentPageNo: state => state.GasEmploy.currentPageNo,
       pageSize: state => state.GasEmploy.pageSize,
       total: state => state.GasEmploy.total,
-      gasEmployWinLoading:state=>state.GasEmploy.gasEmployWinLoading,
-      gasEmployWinVisible:state=>state.GasEmploy.gasEmployWinVisible
+      gasEmployWinLoading: state => state.GasEmploy.gasEmployWinLoading,
+      gasEmployWinVisible: state => state.GasEmploy.gasEmployWinVisible
     }),
     gasEmployPagination() {
       return {
@@ -222,7 +222,7 @@ export default {
       "saveGasEmploy",
       "updateGasEmploy"
     ]),
-    showGasEmployWinHandler(e){
+    showGasEmployWinHandler(e) {
       this.gasEmployWinShow();
       let dataset = e.target.dataset;
       if (dataset && dataset.id) {
@@ -244,19 +244,19 @@ export default {
         }, 100);
       }
     },
-    hideGasEmployWinHandler(){
+    hideGasEmployWinHandler() {
       this.currentGasEmployForm.resetFields();
       this.currentGasEmployId = null;
       this.gasEmployWinHide();
     },
-    submitGasEmloyFormHandler(e){
+    submitGasEmloyFormHandler(e) {
       e.preventDefault();
       this.currentGasEmployForm.validateFields((err, values) => {
         if (!err) {
           if (this.currentGasEmployId) {
             let obj = {
-              gasId:this.currentGasId,
-              gasEmployId:this.currentGasEmployId,
+              gasId: this.currentGasId,
+              gasEmployId: this.currentGasEmployId,
               ...values
             };
             this.updateGasEmploy(obj)
@@ -270,7 +270,7 @@ export default {
               });
           } else {
             let obj = {
-              gasId:this.currentGasId,
+              gasId: this.currentGasId,
               ...values
             };
             this.saveGasEmploy(obj)
@@ -286,13 +286,13 @@ export default {
         }
       });
     },
-    resetGasEmployBindHandler(employId){
+    resetGasEmployBindHandler(employId) {
       this.resetGasEmployBind({
-          gasId: this.currentGasId,
-          employId: employId
-        }).catch(err => {
-          message.warn(err);
-        });
+        gasId: this.currentGasId,
+        employId: employId
+      }).catch(err => {
+        message.warn(err);
+      });
     },
     changeGasEmployStatusHandler(employId, enable) {
       if (enable) {

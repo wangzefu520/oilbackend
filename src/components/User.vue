@@ -31,6 +31,7 @@
       bordered
       :dataSource="datas"
       :pagination="userPagination"
+      @change="changePageHandler"
     >
       <a-avatar slot="avatar" slot-scope="text,record" :src="record.avatar" />
       <a-tag
@@ -80,7 +81,7 @@ export default {
           align: "center",
           key: "authType",
           scopedSlots: { customRender: "authType" }
-		},
+        },
         {
           width: 100,
           title: "电话",
@@ -150,8 +151,8 @@ export default {
     });
   },
   methods: {
-	...mapActions(["loadUser"]),
-	resetSearchHandler() {
+    ...mapActions(["loadUser"]),
+    resetSearchHandler() {
       this.queryParams = {
         nickName: "",
         authType: "0"
@@ -162,10 +163,9 @@ export default {
     },
     searchHandler() {
       let authType = this.queryParams.authType;
-	  let nickname = this.queryParams.nickName;
-	  console.log(authType,nickname);
+      let nickname = this.queryParams.nickName;
       if (
-        (parseInt(authType) > 0) ||
+        parseInt(authType) > 0 ||
         (nickname && nickname.replace(/\s/g, "").length > 0)
       ) {
         this.loadUser({
@@ -178,6 +178,27 @@ export default {
         message.warn("请输入有效的查询参数");
         return;
       }
+    },
+    changePageHandler(paging) {
+      let { current, pageSize } = paging;
+      let authType = this.queryParams.authType;
+      let nickname = this.queryParams.nickName;
+      let obj = {
+        pageNo: current,
+        pageSize: pageSize
+      };
+      if (
+        parseInt(authType) > 0 ||
+        (nickname && nickname.replace(/\s/g, "").length > 0)
+      ) {
+        obj = {
+          authType: authType,
+          nickname: nickname
+        };
+      }
+      this.loadUser(obj).catch(err => {
+        message.warn(err);
+      });
     }
   }
 };

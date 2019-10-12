@@ -10,6 +10,7 @@
       bordered
       :dataSource="datas"
       :pagination="bannerPagination"
+      @change="changePageHandler"
     >
       <span slot="action" slot-scope="text, record">
         <a href="javascript:;" @click="updateGasHandler(record.id)">修改</a>
@@ -141,6 +142,12 @@ export default {
     },
     deleteGasHandler(id) {
       this.deleteGas(id).catch(err => {
+        message.warn(err);
+      });
+    },
+    changePageHandler(paging) {
+      let { current, pageSize } = paging;
+      this.loadGas({ pageNo: current, pageSize: pageSize }).catch(res => {
         message.warn(err);
       });
     }

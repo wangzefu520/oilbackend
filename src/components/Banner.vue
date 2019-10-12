@@ -10,6 +10,7 @@
       bordered
       :dataSource="datas"
       :pagination="bannerPagination"
+      @change="changePageHandler"
     >
       <template slot="action" slot-scope="text, record">
         <a href="javascript:;" @click="changeBannerHandler(record)">修改</a>
@@ -163,6 +164,12 @@ export default {
     },
     deleteBannerHandler(id) {
       this.deleteBanner(id).catch(err => {
+        message.warn(err);
+      });
+    },
+    changePageHandler(paging) {
+      let { current, pageSize } = paging;
+      this.loadBanner({ pageNo: current, pageSize: pageSize }).catch(res => {
         message.warn(err);
       });
     }
