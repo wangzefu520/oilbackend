@@ -139,6 +139,10 @@ export default {
           this.changePsw(obj)
             .then(res => {
               message.success("修改密码成功，新密码为：" + password);
+              setTimeout(()=>{
+                message.warn("修改密码成功，请重新登录");
+                this.$router.replace('/');
+              },2000);
               this.hideChangePswWinHanlder();
             })
             .catch(err => {
